@@ -1,76 +1,115 @@
 import streamlit as st
 import time
 
-st.set_page_config(page_title="Sigma AI Reviewer", layout="wide")
+# Налаштування сторінки в стилі Sigma
+st.set_page_config(page_title="Sigma Multi-Flavor AI Reviewer", layout="wide")
 
-# Стилі Sigma
+# CSS для брендингу
 st.markdown("""
     <style>
-    .stApp { background-color: #f8f9fa; }
-    .report-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #d1d5db; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-    .sigma-badge { background: #0052cc; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-right: 5px; }
+    .stApp { background-color: #f4f7f9; }
+    .report-card { 
+        background: white; 
+        padding: 25px; 
+        border-radius: 15px; 
+        border-left: 8px solid #0052cc; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    .sigma-logo { font-size: 24px; font-weight: bold; color: #0052cc; margin-bottom: 20px; }
+    .risk-table { font-family: monospace; background: #2d2d2d; color: #61afef; padding: 15px; border-radius: 8px; }
     </style>
     """, unsafe_allow_html=True)
 
-# Сценарії (Моки)
+# Сценарії Pull Request (Приклади коду)
 SCENARIOS = {
-    "PR #124: Update Login (Python)": "def login(user, pwd):\n    query = f\"SELECT * FROM users WHERE u='{user}' AND p='{pwd}'\"\n    return db.execute(query)",
-    "PR #125: Dashboard (React)": "useEffect(() => {\n    fetchData();\n}, [Math.random()])",
-    "PR #126: Database Fix (SQL)": "SELECT * FROM large_table JOIN other_table ON true"
+    "PR #124: Auth Security (Python)": """@pytest.fixture
+def ecp_settings(settings):
+    settings.ECP_AUTH = {
+        'CERT_VALIDATION_ENABLED': False,
+        'AUTO_CREATE_USER': True,
+    }""",
+    "PR #125: UI Logic (React)": "useEffect(() => { fetchData(); }, [Math.random()])",
+    "PR #126: Data Query (SQL)": "query = f'SELECT * FROM users WHERE id = {user_id}'"
 }
 
-# Сайдбар
-st.sidebar.image("https://sigma.software/wp-content/themes/sigma/assets/img/logo.svg", width=150)
-st.sidebar.title("Configuration")
-selected_pr = st.sidebar.selectbox("Select Pull Request", list(SCENARIOS.keys()), key="pr_selector")
-persona = st.sidebar.radio("Review Persona", ["🔍 Auditor", "🎓 Mentor", "👊 Blunt Lead"])
+# --- SIDEBAR ---
+st.sidebar.markdown("<div class='sigma-logo'>Sigma AI Engine</div>", unsafe_allow_html=True)
+st.sidebar.write("---")
 
+selected_pr = st.sidebar.selectbox("📂 Select Pull Request", list(SCENARIOS.keys()), key="pr_selector_unique")
+persona = st.sidebar.radio("👤 Review Persona", ["🔍 Auditor", "🎓 Mentor", "🔴 Blunt Lead"])
+
+st.sidebar.write("---")
+st.sidebar.info("Team: **Kachan** 🥬 | Ideathon 2026")
+
+# --- MAIN UI ---
 st.title("🤖 Sigma Multi-Flavor AI Reviewer")
+st.write("Adaptive code review for Enterprise standards.")
 
-# Основна зона
-code_to_review = st.text_area("Code for analysis", value=SCENARIOS[selected_pr], height=200)
+code_input = st.text_area("Code to analyze:", value=SCENARIOS[selected_pr], height=200)
 
 if st.button("🚀 Run Adaptive Review", use_container_width=True):
-    with st.status("Sigma AI Engine active...") as status:
-        st.write("🔍 **Phase 1:** Scanning code structure...")
-        time.sleep(1.2) # Робимо паузу довшою
-        
-        st.write("📂 **Phase 2:** Detecting tech stack & context...")
-        time.sleep(1.5)
-        
-        st.write(f"⚙️ **Phase 3:** Injecting {persona} persona rules...")
+    # Симуляція "розумної" роботи
+    with st.status("Analyzing code complexity...") as status:
+        st.write("🔍 Detecting tech stack (Python/Django detected)...")
         time.sleep(1.2)
-        
-        st.write("🧠 **Phase 4:** Running heuristic security analysis...")
+        st.write(f"⚙️ Applying **{persona}** persona rules...")
+        time.sleep(1.5)
+        st.write("🧠 Running security & performance heuristics...")
         time.sleep(1.8)
-        
-        status.update(label="✅ Analysis Complete. Generating Report...", state="complete")
+        status.update(label="Analysis Complete!", state="complete")
 
-    # Логіка виводу
-    if "def" in code_to_review or "SELECT" in code_to_review:
-        score, color = (4, "red") if "Auditor" in persona else (5, "orange")
-        if "Auditor" in persona:
-            res = "### 🛡 RISK SCORE CARD\n| Risk | Level |\n| :--- | :--- |\n| SQL Injection | HIGH |\n| Data Leak | MED |\n\n**Estimated fix time:** 45 mins"
-        elif "Mentor" in persona:
-            res = "### 🔍 Observation\nPotential SQL Injection.\n### 💡 Why it matters\nAttackers can bypass auth.\n### 🔄 Before-After\n`db.execute(q, params)`"
-        else:
-            res = "### 🔴 DO NOT MERGE\nSeriously? String interpolation in SQL? My grandma codes more secure than this. Fix it."
-    else:
-        score, color = (9, "green"), "### ✅ Looks Good\nCode is clean and follows standards."
+    # Вставка контенту на основі рев'ю Насті
+    if "Auditor" in persona:
+        res_content = """
+### 🛡 RISK SCORE CARD
+<div class='risk-table'>
+┌────────────────────────────────────────────────────────┐<br>
+│ Overall Risk Score:   4.5 / 10  (10 = Critical)        │<br>
+├───────────────────────┬────────────────────────────────┤<br>
+│ Security:       5     │ Performance:   3               │<br>
+│ Architecture:   6     │ Scalability:   2               │<br>
+├───────────────────────┴────────────────────────────────┤<br>
+│ Critical findings:  1 │ Warnings:     5                │<br>
+│ Info findings:      4 │ <b>Estimated fix time: 2h 30m</b>     │<br>
+└────────────────────────────────────────────────────────┘
+</div>
 
+**CRITICAL:** `CERT_VALIDATION_ENABLED: False` detected. This bypasses SSL/TLS verification and opens the system to MITM attacks.
+**Standard:** OWASP A02:2021 / CWE-295
+**Fix:** Isolate the dangerous flag: `assert os.getenv('DJANGO_ENV') != 'production'`
+"""
+    elif "Mentor" in persona:
+        res_content = """
+### 🎓 Mentor Observation
+**DRY Violation (90% Duplication):** Identical fixture bodies for different algorithms.
+### 💡 Why this matters
+Duplicated code increases maintenance cost and risk of bugs when logic changes.
+### 🔄 Before vs After
+**Before:** Two separate functions for DSTU4145 and RSA.
+**After:** `_make_ecp_settings(settings, algorithm)` — one factory to rule them all.
+**Naming:** Rename `User()` to `user_model` as per PEP 8 standards.
+"""
+    else: # Blunt Lead
+        res_content = """
+### 🔴 DO NOT MERGE
+**Seriously? Hardcoded 'False' for security?** My grandma codes more secure than this. 
+Fix the certificate validation and DRY your tears (and your code) before even thinking about a PR. 
+**Verdict:** BLOCK MERGE.
+"""
+
+    # Відображення картки рев'ю
     st.markdown(f"""
-    <div class="report-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>{persona} Review</h2>
-            <div style="background: {color}; color: white; padding: 10px 20px; border-radius: 8px; font-size: 24px;">{score}/10</div>
-        </div>
-        <div style="margin-top: 10px;">
-            <span class="sigma-badge">Security</span><span class="sigma-badge">Sigma Standard</span>
+    <div class='report-card'>
+        <div style='display: flex; justify-content: space-between;'>
+            <h2 style='margin:0;'>{persona} Report</h2>
+            <span style='background:#0052cc; color:white; padding:5px 15px; border-radius:10px;'>Sigma Certified</span>
         </div>
         <hr>
-        {res}
+        {res_content}
     </div>
     """, unsafe_allow_html=True)
 
-st.sidebar.write("---")
-st.sidebar.info("Team: Kachan' 🥬")
+# Footer
+st.write("---")
+st.caption("Built for Sigma Software Ideathon. Context-aware AI code review prototype.")
